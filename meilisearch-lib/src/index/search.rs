@@ -624,7 +624,13 @@ impl<'a, A: AsRef<[u8]>> Formatter<'a, A> {
             // Matcher::match since the call is expensive.
             if format_options.highlight && token.is_word() {
                 if let Some(length) = matcher.matches(token.text()) {
-                    match word.get(..length).zip(word.get(length..)) {
+
+                    let length_in_bytes = word
+                    .chars()
+                    .take(length)
+                    .fold(0, |count, c| count + c.len_utf8());
+
+                    match word.get(..length_in_bytes).zip(word.get(length_in_bytes..)) {
                         Some((head, tail)) => {
                             out.push_str(&self.marks.0);
                             out.push_str(head);
